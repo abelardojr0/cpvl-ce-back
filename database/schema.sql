@@ -58,6 +58,12 @@ CREATE TABLE IF NOT EXISTS member_cards (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_member_cards_user_id ON member_cards(user_id);
 
+CREATE TABLE IF NOT EXISTS app_settings (
+  key VARCHAR(80) PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Admin inicial:
 -- E-mail: admin@carteirinha.local
 -- Senha: admin123

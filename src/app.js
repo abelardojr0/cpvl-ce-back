@@ -17,6 +17,7 @@ const allowedOrigins = [
   ...parseOrigins(process.env.FRONTEND_URLS),
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:5175",
 ].filter(Boolean);
 
 app.use(
