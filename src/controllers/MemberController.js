@@ -18,6 +18,16 @@ const MemberController = {
     return response.json(card);
   },
 
+  findByUserId: async (request, response) => {
+    const card = await MemberModel.findByUserId(request.params.userId);
+
+    if (!card) {
+      return response.status(404).json({ message: "Carteirinha nao encontrada." });
+    }
+
+    return response.json(card);
+  },
+
   create: async (request, response) => {
     const {
       fullName,
