@@ -22,5 +22,11 @@ memberRoutes.put(
   adminMiddleware,
   MemberController.update,
 );
+memberRoutes.delete(
+  "/:userId",
+  authMiddleware,
+  adminMiddleware,
+  MemberController.delete,
+);
 
 module.exports = memberRoutes;

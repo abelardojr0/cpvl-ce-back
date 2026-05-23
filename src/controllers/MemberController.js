@@ -126,6 +126,16 @@ const MemberController = {
     const card = await MemberModel.findByUserId(userId);
     return response.json(card);
   },
+
+  delete: async (request, response) => {
+    const deletedUser = await UserModel.deleteById(request.params.userId);
+
+    if (!deletedUser) {
+      return response.status(404).json({ message: "Usuario nao encontrado." });
+    }
+
+    return response.status(204).send();
+  },
 };
 
 module.exports = MemberController;

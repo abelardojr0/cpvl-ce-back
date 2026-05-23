@@ -49,6 +49,17 @@ const UserModel = {
 
     return result.rows[0];
   },
+
+  deleteById: async (id) => {
+    const result = await pool.query(
+      `DELETE FROM users
+       WHERE id = $1 AND type = 'usuario'
+       RETURNING ${publicUserFields}`,
+      [id],
+    );
+
+    return result.rows[0];
+  },
 };
 
 module.exports = UserModel;
