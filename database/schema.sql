@@ -13,18 +13,6 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
-  CREATE TYPE level_type AS ENUM (
-    'Aluno',
-    'Iniciante',
-    'Intermediario',
-    'Avancado',
-    'Instrutor'
-  );
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
   CREATE TYPE card_status AS ENUM ('ativo', 'inativo');
 EXCEPTION
   WHEN duplicate_object THEN null;
@@ -44,7 +32,7 @@ CREATE TABLE IF NOT EXISTS member_cards (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   modality modality_type NOT NULL,
-  level level_type NOT NULL,
+  level VARCHAR(160) NOT NULL,
   annuity_valid_until DATE NOT NULL,
   blood_type VARCHAR(4) NOT NULL,
   emergency_contact_name VARCHAR(160) NOT NULL,
@@ -61,6 +49,9 @@ CREATE INDEX IF NOT EXISTS idx_member_cards_user_id ON member_cards(user_id);
 
 ALTER TABLE member_cards
   ADD COLUMN IF NOT EXISTS photo_url TEXT;
+
+ALTER TABLE member_cards
+  ALTER COLUMN level TYPE VARCHAR(160) USING level::TEXT;
 
 CREATE TABLE IF NOT EXISTS app_settings (
   key VARCHAR(80) PRIMARY KEY,
