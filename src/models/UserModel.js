@@ -27,6 +27,28 @@ const UserModel = {
     );
     return result.rows[0];
   },
+
+  update: async ({ id, name, email, passwordHash }) => {
+    const fields = ["name = $1", "email = $2", "updated_at = now()"];
+    const values = [name, email];
+
+    if (passwordHash) {
+      fields.push(`password_hash = $${values.length + 1}`);
+      values.push(passwordHash);
+    }
+
+    values.push(id);
+
+    const result = await pool.query(
+      `UPDATE users
+       SET ${fields.join(", ")}
+       WHERE id = $${values.length}
+       RETURNING ${publicUserFields}`,
+      values,
+    );
+
+    return result.rows[0];
+  },
 };
 
 module.exports = UserModel;

@@ -16,5 +16,11 @@ memberRoutes.get(
   MemberController.findByUserId,
 );
 memberRoutes.post("/", authMiddleware, adminMiddleware, MemberController.create);
+memberRoutes.put(
+  "/:userId",
+  authMiddleware,
+  adminMiddleware,
+  MemberController.update,
+);
 
 module.exports = memberRoutes;

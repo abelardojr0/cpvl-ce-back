@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS member_cards (
   emergency_contact_name VARCHAR(160) NOT NULL,
   emergency_contact_phone VARCHAR(30) NOT NULL,
   health_plan VARCHAR(160) NOT NULL DEFAULT 'Nao possui',
+  photo_url TEXT,
   status card_status NOT NULL DEFAULT 'ativo',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -57,6 +58,9 @@ CREATE TABLE IF NOT EXISTS member_cards (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_member_cards_user_id ON member_cards(user_id);
+
+ALTER TABLE member_cards
+  ADD COLUMN IF NOT EXISTS photo_url TEXT;
 
 CREATE TABLE IF NOT EXISTS app_settings (
   key VARCHAR(80) PRIMARY KEY,
