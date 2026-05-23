@@ -2,6 +2,8 @@ const bcrypt = require("bcryptjs");
 const MemberModel = require("../models/MemberModel");
 const UserModel = require("../models/UserModel");
 
+const validLevels = ["Aluno", "Iniciante", "Intermediario", "Avancado", "Instrutor"];
+
 const MemberController = {
   list: async (request, response) => {
     const members = await MemberModel.list();
@@ -45,6 +47,10 @@ const MemberController = {
 
     if (!fullName || !email || !password || !photoUrl) {
       return response.status(400).json({ message: "Dados obrigatorios ausentes." });
+    }
+
+    if (!validLevels.includes(level)) {
+      return response.status(400).json({ message: "Nivel do piloto invalido." });
     }
 
     const existingUser = await UserModel.findByEmail(email);
@@ -95,6 +101,10 @@ const MemberController = {
 
     if (!fullName || !email || !photoUrl) {
       return response.status(400).json({ message: "Dados obrigatorios ausentes." });
+    }
+
+    if (!validLevels.includes(level)) {
+      return response.status(400).json({ message: "Nivel do piloto invalido." });
     }
 
     const existingUser = await UserModel.findByEmail(email);

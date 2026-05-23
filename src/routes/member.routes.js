@@ -4,29 +4,30 @@ const {
   adminMiddleware,
   authMiddleware,
 } = require("../middlewares/authMiddleware");
+const asyncHandler = require("../middlewares/asyncHandler");
 
 const memberRoutes = Router();
 
-memberRoutes.get("/", authMiddleware, adminMiddleware, MemberController.list);
-memberRoutes.get("/me/card", authMiddleware, MemberController.myCard);
+memberRoutes.get("/", authMiddleware, adminMiddleware, asyncHandler(MemberController.list));
+memberRoutes.get("/me/card", authMiddleware, asyncHandler(MemberController.myCard));
 memberRoutes.get(
   "/:userId/card",
   authMiddleware,
   adminMiddleware,
-  MemberController.findByUserId,
+  asyncHandler(MemberController.findByUserId),
 );
-memberRoutes.post("/", authMiddleware, adminMiddleware, MemberController.create);
+memberRoutes.post("/", authMiddleware, adminMiddleware, asyncHandler(MemberController.create));
 memberRoutes.put(
   "/:userId",
   authMiddleware,
   adminMiddleware,
-  MemberController.update,
+  asyncHandler(MemberController.update),
 );
 memberRoutes.delete(
   "/:userId",
   authMiddleware,
   adminMiddleware,
-  MemberController.delete,
+  asyncHandler(MemberController.delete),
 );
 
 module.exports = memberRoutes;
