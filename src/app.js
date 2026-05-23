@@ -6,10 +6,12 @@ const routes = require("./routes");
 
 const app = express();
 
+const normalizeOrigin = (origin = "") => origin.trim().replace(/\/$/, "");
+
 const parseOrigins = (value = "") =>
   value
     .split(",")
-    .map((origin) => origin.trim())
+    .map(normalizeOrigin)
     .filter(Boolean);
 
 const allowedOrigins = [
@@ -18,12 +20,13 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
+  "https://cpvl-ce.vercel.app",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
         return callback(null, true);
       }
 
