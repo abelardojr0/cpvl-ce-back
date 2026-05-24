@@ -5,6 +5,7 @@ const selectFields = `
   mc.user_id AS "userId",
   u.name AS "fullName",
   u.email,
+  u.cpf,
   mc.modality,
   mc.level,
   to_char(mc.annuity_valid_until, 'YYYY-MM') AS "annuityValidUntil",
@@ -17,13 +18,18 @@ const selectFields = `
   mc.created_at AS "createdAt"
 `;
 
-const ensurePhotoColumn = async () => {
+const ensureColumns = async () => {
+  await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS cpf VARCHAR(20)");
+  await pool.query(
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_cpf ON users(cpf) WHERE cpf IS NOT NULL",
+  );
   await pool.query("ALTER TABLE member_cards ADD COLUMN IF NOT EXISTS photo_url TEXT");
+  await pool.query("ALTER TABLE member_cards ALTER COLUMN level TYPE VARCHAR(160) USING level::TEXT");
 };
 
 const MemberModel = {
   list: async () => {
-    await ensurePhotoColumn();
+    await ensureColumns();
 
     const result = await pool.query(
       `SELECT ${selectFields}
@@ -35,7 +41,7 @@ const MemberModel = {
   },
 
   findByUserId: async (userId) => {
-    await ensurePhotoColumn();
+    await ensureColumns();
 
     const result = await pool.query(
       `SELECT ${selectFields}
@@ -48,7 +54,7 @@ const MemberModel = {
   },
 
   create: async (payload) => {
-    await ensurePhotoColumn();
+    await ensureColumns();
 
     const result = await pool.query(
       `INSERT INTO member_cards (
@@ -80,7 +86,7 @@ const MemberModel = {
   },
 
   updateByUserId: async (userId, payload) => {
-    await ensurePhotoColumn();
+    await ensureColumns();
 
     const result = await pool.query(
       `UPDATE member_cards

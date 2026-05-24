@@ -2,6 +2,9 @@ const bcrypt = require("bcryptjs");
 const MemberModel = require("../models/MemberModel");
 const UserModel = require("../models/UserModel");
 
+const onlyNumbers = (value = "") => String(value).replace(/\D/g, "");
+const passwordFromCpf = (cpf) => onlyNumbers(cpf).slice(0, 6);
+
 const MemberController = {
   list: async (request, response) => {
     const members = await MemberModel.list();
@@ -32,7 +35,7 @@ const MemberController = {
     const {
       fullName,
       email,
-      password,
+      cpf,
       modality,
       level,
       annuityValidUntil,
@@ -43,8 +46,14 @@ const MemberController = {
       photoUrl,
     } = request.body;
 
-    if (!fullName || !email || !password || !photoUrl) {
+    if (!fullName || !email || !cpf || !photoUrl) {
       return response.status(400).json({ message: "Dados obrigatorios ausentes." });
+    }
+
+    const normalizedCpf = onlyNumbers(cpf);
+
+    if (normalizedCpf.length !== 11) {
+      return response.status(400).json({ message: "Informe um CPF valido." });
     }
 
     if (!level || typeof level !== "string" || !level.trim()) {
@@ -57,10 +66,17 @@ const MemberController = {
       return response.status(409).json({ message: "E-mail ja cadastrado." });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const existingCpf = await UserModel.findByCpf(normalizedCpf);
+
+    if (existingCpf) {
+      return response.status(409).json({ message: "CPF ja cadastrado." });
+    }
+
+    const passwordHash = await bcrypt.hash(passwordFromCpf(normalizedCpf), 10);
     const user = await UserModel.create({
       name: fullName,
       email,
+      cpf: normalizedCpf,
       passwordHash,
       type: "usuario",
     });
@@ -86,7 +102,7 @@ const MemberController = {
     const {
       fullName,
       email,
-      password,
+      cpf,
       modality,
       level,
       annuityValidUntil,
@@ -97,8 +113,14 @@ const MemberController = {
       photoUrl,
     } = request.body;
 
-    if (!fullName || !email || !photoUrl) {
+    if (!fullName || !email || !cpf || !photoUrl) {
       return response.status(400).json({ message: "Dados obrigatorios ausentes." });
+    }
+
+    const normalizedCpf = onlyNumbers(cpf);
+
+    if (normalizedCpf.length !== 11) {
+      return response.status(400).json({ message: "Informe um CPF valido." });
     }
 
     if (!level || typeof level !== "string" || !level.trim()) {
@@ -111,12 +133,19 @@ const MemberController = {
       return response.status(409).json({ message: "E-mail ja cadastrado." });
     }
 
-    const passwordHash = password ? await bcrypt.hash(password, 10) : undefined;
+    const existingCpf = await UserModel.findByCpf(normalizedCpf);
+
+    if (existingCpf && String(existingCpf.id) !== String(userId)) {
+      return response.status(409).json({ message: "CPF ja cadastrado." });
+    }
+
+    const passwordHash = await bcrypt.hash(passwordFromCpf(normalizedCpf), 10);
 
     await UserModel.update({
       id: userId,
       name: fullName,
       email,
+      cpf: normalizedCpf,
       passwordHash,
     });
 

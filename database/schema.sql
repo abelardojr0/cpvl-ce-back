@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(160) NOT NULL,
   email VARCHAR(160) NOT NULL UNIQUE,
+  cpf VARCHAR(20),
   password_hash TEXT NOT NULL,
   type user_type NOT NULL DEFAULT 'usuario',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -46,6 +47,11 @@ CREATE TABLE IF NOT EXISTS member_cards (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_member_cards_user_id ON member_cards(user_id);
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS cpf VARCHAR(20);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_cpf ON users(cpf) WHERE cpf IS NOT NULL;
 
 ALTER TABLE member_cards
   ADD COLUMN IF NOT EXISTS photo_url TEXT;
