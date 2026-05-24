@@ -1,6 +1,7 @@
 const pool = require("../config/database");
 
 const SIGNATURE_KEY = "digital_signature";
+const PRESIDENT_NAME = "Roger Messala Pimentel Cajazeiras";
 
 const ensureTable = async () => {
   await pool.query(`
@@ -14,9 +15,15 @@ const ensureTable = async () => {
 
 const defaultSignature = {
   signatureDataUrl: null,
-  presidentName: "José Clenylson Campos Cordeiro",
+  presidentName: PRESIDENT_NAME,
   presidentRole: "Presidente",
 };
+
+const normalizeSignature = (signature = {}) => ({
+  ...defaultSignature,
+  ...signature,
+  presidentName: PRESIDENT_NAME,
+});
 
 const SettingsModel = {
   getSignature: async () => {
@@ -27,16 +34,24 @@ const SettingsModel = {
       [SIGNATURE_KEY],
     );
 
-    return result.rows[0]?.value || defaultSignature;
+    const signature = normalizeSignature(result.rows[0]?.value);
+
+    if (result.rows[0]?.value?.presidentName !== PRESIDENT_NAME) {
+      await pool.query(
+        `UPDATE app_settings
+         SET value = $2, updated_at = now()
+         WHERE key = $1`,
+        [SIGNATURE_KEY, signature],
+      );
+    }
+
+    return signature;
   },
 
   saveSignature: async ({ signatureDataUrl }) => {
     await ensureTable();
 
-    const value = {
-      ...defaultSignature,
-      signatureDataUrl,
-    };
+    const value = normalizeSignature({ signatureDataUrl });
 
     const result = await pool.query(
       `INSERT INTO app_settings (key, value, updated_at)
