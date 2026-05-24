@@ -7,6 +7,5 @@ const authRoutes = Router();
 
 authRoutes.post("/login", asyncHandler(AuthController.login));
 authRoutes.get("/me", authMiddleware, asyncHandler(AuthController.me));
-authRoutes.post("/forgot-password", asyncHandler(AuthController.forgotPassword));
 
 module.exports = authRoutes;

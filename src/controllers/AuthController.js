@@ -39,19 +39,6 @@ const AuthController = {
     const user = await UserModel.findById(request.user.id);
     return response.json(user);
   },
-
-  forgotPassword: async (request, response) => {
-    const { email } = request.body;
-
-    if (!email) {
-      return response.status(400).json({ message: "Informe o e-mail." });
-    }
-
-    return response.json({
-      message:
-        "Solicitacao recebida. Configure o envio de e-mail para concluir o fluxo.",
-    });
-  },
 };
 
 module.exports = AuthController;
